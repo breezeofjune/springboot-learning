@@ -1,6 +1,8 @@
 package com.zz.api;
 
 import com.zz.domain.User;
+import com.zz.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
@@ -12,52 +14,49 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+    @Autowired
+    private UserService userService;
+
     // 创建线程安全的Map
     static ArrayList<User> users = new ArrayList<User>();
     private Long id;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public List<User> getUsers(){
-        return users;
+        List<User> userList = userService.getUsers();
+        return userList;
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public User createUser(@RequestBody User input){
-        users.add(input);
-        System.out.println(users);
-        return input;
+        userService.createUser(input);
+        return userService.getUserById(input.getId());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public User getUserbyId(@PathVariable(value = "id") Long id) {
         System.out.println("Query id is " + id);
-        User user = null;
-        for (User item: users) {
-            System.out.println(id + ", " + item.getId());
-            if (id == item.getId()) {
-                user = item;
-                break;
-            }
-        }
-        return user;
+        return userService.getUserById(id);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public User updateUserbyId(@PathVariable(value = "id") Long id, @RequestBody User body) {
-        User user = getUserbyId(id);
-        user.setAge(body.getAge());
-        return user;
+        User user = userService.getUserById(id);
+        // Todo: judge null user
+        if (body.getAge() != null) {
+            user.setAge(body.getAge());
+        }
+        if (body.getName() != null) {
+            user.setName(body.getName());
+        }
+
+        userService.updateUserById(user);
+        return null;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public String deleteUserById(@PathVariable(value = "id") Long id) {
-        for (User item : users) {
-            System.out.println(id + ", " + item.getId());
-            if (id == item.getId()) {
-                users.remove(item);
-                break;
-            }
-        }
+        userService.deleteById(id);
         return "User " + id + " is deleted";
     }
 }
