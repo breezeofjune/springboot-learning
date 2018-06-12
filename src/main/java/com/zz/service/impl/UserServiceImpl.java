@@ -5,6 +5,7 @@ import com.zz.domain.User;
 import com.zz.service.UserService;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public class UserServiceImpl implements UserService{
     private UserDao userDao;
 
     @Override
+    // Fixme: Key is User::id, weirld!
+    @Cacheable(value = "User", key = "#id")
     public User getUserById(Long id) {
         return userDao.getUserById(id);
     }

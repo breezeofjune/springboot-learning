@@ -1,9 +1,11 @@
 package com.zz.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by ZackZhou on 2018/5/30.
  */
-public class User {
+public class User implements Serializable {
     public Long getId() {
         return id;
     }
